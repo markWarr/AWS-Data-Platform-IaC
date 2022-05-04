@@ -12,7 +12,9 @@ First, install your AWS access keys into local environment variables.
 For example, on MacOS:
 
 export AWS_ACCESS_KEY_ID="*************"
+
 export AWS_SECRET_ACCESS_KEY="************"
+
 export AWS_SESSION_TOKEN="IQoJb3************"
 
 
@@ -22,11 +24,13 @@ To collaborate, use a state data store such as terraform cloud or consul.
 
 First, install Terraform locally. Then use the following commands:
 
-Terraform init
+terraform init
 
 terraform plan -out config.tfplan
 
 terraform apply config.tfplan
+
+To tear down the infrastructure:
 
 terraform destroy
 
