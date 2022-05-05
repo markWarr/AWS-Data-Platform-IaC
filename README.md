@@ -2,7 +2,7 @@
 # AWS-Data-Platform-IaC
 Scripts to create a usable AWS Data Platform instance, preloaded with data. 
 
-Make sure you run Terraform Destroy when you're finished or you'll be leaving the destruction to the Sandbox Friday tear down routine.
+Make sure you run terraform destroy to tear down the installation when you have finished.
 
 It will take some time to create the cluster but terraform will keep you updated every 10 seconds.
 
