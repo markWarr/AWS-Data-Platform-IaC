@@ -98,8 +98,8 @@ resource "aws_security_group" "allow_access" {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block           = "168.31.0.0/16"
-  enable_dns_hostnames = true
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_hostnames = var.enable_dns_hostnames
 
   tags = {
     name = "emr_test"
@@ -108,7 +108,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "main" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = "168.31.0.0/20"
+  cidr_block = var.vpc_subnet1_cidr_block
 
   tags = {
     name = "emr_test"
