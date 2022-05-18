@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "EMR_instance_type"{
   type        = string
   description = "EMR Instance Type"
-  default     = "m5.xlarge"
+  default     = "m4.large"
 }
 
 variable "enable_dns_hostnames" {

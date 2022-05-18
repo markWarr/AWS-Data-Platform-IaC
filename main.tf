@@ -1,15 +1,16 @@
 resource "aws_emr_cluster" "cluster" {
   name          = "emr-test-arn-madeTech"
   release_label = "emr-5.35.0"
-  applications  = ["Hive"]
-  log_uri       = "s3://aws-logs-261219435789-us-east-1/elasticmapreduce/"
+  applications  = ["Spark"]
+  log_uri       = "s3://madetech-emr-log-bucket/elasticmapreduce/"
+  
   ec2_attributes {
     subnet_id                         = aws_subnet.main.id
     emr_managed_master_security_group = aws_security_group.allow_access.id
     emr_managed_slave_security_group  = aws_security_group.allow_access.id
     instance_profile                  = aws_iam_instance_profile.emr_profile.arn
   }
-
+ 
   master_instance_group {
     instance_type = var.EMR_instance_type
   }
@@ -40,7 +41,7 @@ resource "aws_emr_cluster" "cluster" {
         {
           "Classification": "export",
           "Properties": {
-            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
+            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64"
           }
         }
       ],
@@ -52,7 +53,7 @@ resource "aws_emr_cluster" "cluster" {
         {
           "Classification": "export",
           "Properties": {
-            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
+            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64"
           }
         }
       ],
