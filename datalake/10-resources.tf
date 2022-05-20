@@ -1,88 +1,3 @@
-resource "aws_emr_cluster" "cluster" {
-  name          = "emr-test-arn-madeTech"
-  release_label = "emr-5.35.0"
-  applications  = ["Spark"]
-  log_uri       = "s3://madetech-emr-log-bucket/elasticmapreduce/"
-  
-  ec2_attributes {
-    subnet_id                         = aws_subnet.main.id
-    emr_managed_master_security_group = aws_security_group.allow_access.id
-    emr_managed_slave_security_group  = aws_security_group.allow_access.id
-    instance_profile                  = aws_iam_instance_profile.emr_profile.arn
-  }
- 
-  master_instance_group {
-    instance_type = var.EMR_instance_type
-  }
-
-  core_instance_group {
-    instance_count = 1
-    instance_type  = var.EMR_instance_type
-  }
-
-  tags = {
-    role     = "rolename"
-    dns_zone = "env_zone"
-    env      = "env"
-    name     = "name-env"
-  }
-
-  bootstrap_action {
-    path = "s3://elasticmapreduce/bootstrap-actions/run-if"
-    name = "runif"
-    args = ["instance.isMaster=true", "echo running on master node"]
-  }
-
-
-  step {
-    action_on_failure = "TERMINATE_CLUSTER"
-    name              = "Setup Hadoop Debugging"
-
-    hadoop_jar_step {
-      jar  = "command-runner.jar"
-      args = ["state-pusher-script"]
-    }
-  }
-
-  # Optional: ignore outside changes to running cluster steps. 
-  #  It is highly recommended to utilize the lifecycle configuration block with 
-  #  ignore_changes if other steps are being managed outside of Terraform. 
-  lifecycle {
-    ignore_changes = [step]
-  }
-
-  configurations_json = <<EOF
-  [
-    {
-      "Classification": "hadoop-env",
-      "Configurations": [
-        {
-          "Classification": "export",
-          "Properties": {
-            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64"
-          }
-        }
-      ],
-      "Properties": {}
-    },
-    {
-      "Classification": "spark-env",
-      "Configurations": [
-        {
-          "Classification": "export",
-          "Properties": {
-            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64"
-          }
-        }
-      ],
-      "Properties": {}
-    }
-  ]
-EOF
-
-  service_role = aws_iam_role.iam_emr_service_role.arn
-}
-
 resource "aws_security_group" "allow_access" {
   name        = "allow_access"
   description = "Allow inbound traffic"
@@ -179,6 +94,7 @@ resource "aws_iam_role" "iam_emr_service_role" {
 EOF
 }
 
+# IAM role ploicy for EMR Service
 resource "aws_iam_role_policy" "iam_emr_service_policy" {
   name = "iam_emr_service_policy"
   role = aws_iam_role.iam_emr_service_role.id
@@ -249,6 +165,77 @@ resource "aws_iam_role_policy" "iam_emr_service_policy" {
 EOF
 }
 
+# IAM role for EMR Studio
+resource "aws_iam_role" "iam_emr_studio_role" {
+  name = "iam_emr_studio_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "elasticmapreduce.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# IAM role policy for EMR Studio
+# see https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-studio-service-role.html
+resource "aws_iam_role_policy" "iam_emr_studio_policy" {
+  name = "iam_emr_studio_policy"
+  role = aws_iam_role.iam_emr_studio_role.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Resource": "*",
+        "Action": [
+            "ec2:CreateNetworkInterface", 
+            "ec2:CreateNetworkInterfacePermission", 
+            "ec2:DeleteNetworkInterface", 
+            "ec2:DeleteNetworkInterfacePermission", 
+            "ec2:DescribeNetworkInterfaces", 
+            "ec2:ModifyNetworkInterfaceAttribute", 
+            "ec2:AuthorizeSecurityGroupEgress", 
+            "ec2:AuthorizeSecurityGroupIngress", 
+            "ec2:CreateSecurityGroup",
+            "ec2:DescribeSecurityGroups", 
+            "ec2:RevokeSecurityGroupEgress",
+            "ec2:DescribeTags",
+            "ec2:DescribeInstances",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeVpcs",
+            "elasticmapreduce:ListInstances", 
+            "elasticmapreduce:DescribeCluster", 
+            "elasticmapreduce:ListSteps",
+            "secretsmanager:GetSecretValue",
+            "ec2:CreateTags",
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:GetEncryptionConfiguration",
+            "s3:ListBucket",
+            "s3:DeleteObject",
+            "iam:GetUser",
+            "iam:GetRole",
+            "iam:ListUsers",
+            "iam:ListRoles",
+            "sso:GetManagedApplicationInstance",
+            "sso-directory:SearchUsers"
+        ]
+    }]
+}
+EOF
+}
+
 # IAM Role for EC2 Instance Profile
 resource "aws_iam_role" "iam_emr_profile_role" {
   name = "iam_emr_profile_role"
@@ -275,6 +262,7 @@ resource "aws_iam_instance_profile" "emr_profile" {
   role = aws_iam_role.iam_emr_profile_role.name
 }
 
+# IAM Role policy for EC2 Instance Profile
 resource "aws_iam_role_policy" "iam_emr_profile_policy" {
   name = "iam_emr_profile_policy"
   role = aws_iam_role.iam_emr_profile_role.id
