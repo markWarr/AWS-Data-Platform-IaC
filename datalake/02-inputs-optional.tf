@@ -2,7 +2,7 @@
 variable "application" {
   description = "Name of the application"
   type        = string
-  default     = "Data Lake"
+  default     = "DataLake"
 
   validation {
     condition = (
