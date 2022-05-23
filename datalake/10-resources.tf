@@ -31,6 +31,33 @@ resource "aws_security_group" "allow_access" {
   }
 }
 
+resource "aws_security_group" "no_ingress" {
+  name        = "no_ingress"
+  description = "Allow only outbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  depends_on = [aws_subnet.main]
+
+  lifecycle {
+    ignore_changes = [
+      ingress,
+      egress,
+    ]
+  }
+
+  tags = {
+    name = "emr_test"
+  }
+}
+
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = var.enable_dns_hostnames
