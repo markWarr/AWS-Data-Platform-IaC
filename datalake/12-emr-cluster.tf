@@ -1,7 +1,7 @@
 resource "aws_emr_cluster" "cluster" {
   name          = "emr-test-arn-madeTech"
   release_label = "emr-5.35.0"
-  applications  = ["Spark"]
+  applications  = ["Spark", "JupyterEnterpriseGateway"]
   log_uri       = "s3://madetech-emr-log-bucket/elasticmapreduce/"
   
   ec2_attributes {
