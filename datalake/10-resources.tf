@@ -31,9 +31,9 @@ resource "aws_security_group" "allow_access" {
   }
 }
 
-resource "aws_security_group" "no_ingress" {
-  name        = "no_ingress"
-  description = "Allow only outbound traffic"
+resource "aws_security_group" "workspace" {
+  name        = "workspace"
+  description = "Allow only outbound traffic for workspace"
   vpc_id      = aws_vpc.main.id
 
   egress {
@@ -54,9 +54,84 @@ resource "aws_security_group" "no_ingress" {
 
   tags = {
     name = "emr_test"
+    for-use-with-amazon-emr-managed-policies="true"
   }
 }
 
+resource "aws_security_group" "EMREngineSecurityGroup" {
+name        = "EMREngineSecurityGroup"
+  description = "Allow only outbound traffic"
+  vpc_id      = aws_vpc.main.id
+  depends_on = [aws_subnet.main]
+
+  lifecycle {
+    ignore_changes = [
+      ingress,
+      egress,
+    ]
+  }
+
+  tags = {
+    for-use-with-amazon-emr-managed-policies="true"
+  }
+}
+
+resource "aws_security_group_rule" "allow_emr_workspace" {
+    type = "ingress"
+    from_port = 18888
+    to_port = 18888
+    protocol = "tcp"
+    security_group_id = aws_security_group.EMREngineSecurityGroup.id
+    source_security_group_id = aws_security_group.EMRWorkspaceSecurityGroupGit.id
+}
+
+resource "aws_security_group" "EMRWorkspaceSecurityGroupGit" {
+  name        = "EMRWorkspaceSecurityGroupGit"
+  description = "Allows outbound traffic from Amazon EMR Studio Workspaces to clusters and publicly-hosted Git repos."
+  vpc_id      = aws_vpc.main.id
+
+  egress     = [
+           {
+               cidr_blocks      = [
+                   "0.0.0.0/0",
+                ]
+               description      = "Required for Amazon EMR Studio Workspace and Git communication."
+              from_port        = 443
+               ipv6_cidr_blocks = []
+               prefix_list_ids  = []
+               protocol         = "tcp"
+               security_groups  = []
+               self             = false
+               to_port          = 443
+            },
+           {
+               cidr_blocks      = []
+               description      = "Required for Amazon EMR Studio Workspace and cluster communication."
+               from_port        = 18888
+              ipv6_cidr_blocks = []
+              prefix_list_ids  = []
+               protocol         = "tcp"
+               security_groups  = [
+                   aws_security_group.EMREngineSecurityGroup.id,
+                ]
+               self             = false
+               to_port          = 18888
+            },
+        ] 
+
+  depends_on = [aws_subnet.main]
+
+  lifecycle {
+    ignore_changes = [
+      ingress,
+      egress,
+    ]
+  }
+
+  tags = {
+    for-use-with-amazon-emr-managed-policies="true"
+  }  
+}
 
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
