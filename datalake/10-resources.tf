@@ -31,33 +31,6 @@ resource "aws_security_group" "allow_access" {
   }
 }
 
-resource "aws_security_group" "workspace" {
-  name        = "workspace"
-  description = "Allow only outbound traffic for workspace"
-  vpc_id      = aws_vpc.main.id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  depends_on = [aws_subnet.main]
-
-  lifecycle {
-    ignore_changes = [
-      ingress,
-      egress,
-    ]
-  }
-
-  tags = {
-    name = "emr_test"
-    for-use-with-amazon-emr-managed-policies="true"
-  }
-}
-
 resource "aws_security_group" "EMREngineSecurityGroup" {
 name        = "EMREngineSecurityGroup"
   description = "Allow only outbound traffic"
@@ -76,6 +49,8 @@ name        = "EMREngineSecurityGroup"
   }
 }
 
+# This ingress security group rule isn't directly included in the EMREngineSecurityGroup definition since doing so creates a circular reference 
+# between security groups which Terraform can't handle. This is the suggested workaround. 
 resource "aws_security_group_rule" "allow_emr_workspace" {
     type = "ingress"
     from_port = 18888
