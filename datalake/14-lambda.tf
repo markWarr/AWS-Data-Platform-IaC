@@ -6,6 +6,7 @@ function_name                  = "Import_MovieLens_Data_Lambda_Function"
 role                           = aws_iam_role.lambda_role.arn
 handler                        = "lambda.lambda_handler"
 runtime                        = "python3.8"
+timeout                        = 60
 depends_on                     = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 #todo configuration timeout to 30 secoinds
