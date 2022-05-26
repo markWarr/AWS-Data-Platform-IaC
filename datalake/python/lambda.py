@@ -1,6 +1,7 @@
 # This lambda function takes the movielens dataset, unzips it and saves it to an s3 bucket.
 #  uses boto: https://github.com/boto/boto3
 # Each execution context provides 512 MB of additional disk space in the /tmp directory.
+# To increase this, increase the ephemeral_storage in the lambda configuration.
 # The /tmp directory is used to save the zip file and the extracted files.
 # Movielens data set ml-1m is 5.9MB.
 import boto3
