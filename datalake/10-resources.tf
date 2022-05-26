@@ -378,3 +378,59 @@ resource "aws_iam_role_policy" "iam_emr_profile_policy" {
 }
 EOF
 }
+
+# IAM role for lambda
+resource "aws_iam_role" "lambda_role" {
+name   = "Data_Init_Lambda_Function_Role"
+assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+# IAM role policy for lambda
+resource "aws_iam_policy" "iam_policy_for_lambda" {
+ 
+ name         = "aws_iam_policy_for_terraform_aws_lambda_role"
+ path         = "/"
+ description  = "AWS IAM Policy for managing aws lambda role"
+ policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": [
+       "logs:CreateLogGroup",
+       "logs:CreateLogStream",
+       "logs:PutLogEvents",
+       "s3:PutObject",
+       "s3:GetObject"       
+     ],
+     "Resource": [
+        "arn:aws:logs:*:*:*",
+        "arn:aws:s3:::${var.s3_emr_studio_name}/*",
+        "arn:aws:s3:::${var.s3_emr_studio_name}"
+     ],
+     "Effect": "Allow"
+   }
+ ]
+}
+EOF
+}
+
+# IAM role policy attachment for lambda
+resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
+ role        = aws_iam_role.lambda_role.name
+ policy_arn  = aws_iam_policy.iam_policy_for_lambda.arn
+}
