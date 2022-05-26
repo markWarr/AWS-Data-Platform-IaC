@@ -34,6 +34,7 @@ To tear down the infrastructure:
 
 terraform destroy
 
+To manually import the movielens data, run the following Lambda as 'test': Import_MovieLens_Data_Lambda_Function
 
 # References
 See https://aws.amazon.com/emr/ for EMR docs.
@@ -46,3 +47,8 @@ https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-INSTANCE_TYPE_NOT_SUP
 
 Pricing of EMR Instance types:
 https://aws.amazon.com/emr/pricing/
+
+Intro to EMR Studio
+https://docs.aws.amazon.com/emr/latest/ManagementGuide/use-an-emr-studio.html
+
+movielens data downloaded from here: http://files.grouplens.org/datasets/movielens/ml-100k.zip
