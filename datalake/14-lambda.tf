@@ -9,7 +9,7 @@ data "archive_file" "lf_settings_1_zip" {
 # This lambda function takes the movielens dataset, unzips it and saves it to an s3 bucket.
 # Timeout set to 60 seconds - default is 3s.
 resource "aws_lambda_function" "terraform_lambda_func" {
-filename                       = "${path.module}/python/lambda.zip"
+filename                       = "${path.module}/scripts/lambda.zip"
 function_name                  = "Import_MovieLens_Data_Lambda_Function"
 role                           = aws_iam_role.lambda_role.arn
 handler                        = "lambda.lambda_handler"
