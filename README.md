@@ -34,7 +34,7 @@ To tear down the infrastructure:
 
 terraform destroy
 
-To manually import the movielens data, run the following Lambda as 'test': Import_MovieLens_Data_Lambda_Function
+To manually import the movielens data, run the following Lambda using the 'test' function: Import_MovieLens_Data_Lambda_Function
 
 # References
 See https://aws.amazon.com/emr/ for EMR docs.
@@ -52,3 +52,17 @@ Intro to EMR Studio
 https://docs.aws.amazon.com/emr/latest/ManagementGuide/use-an-emr-studio.html
 
 movielens data downloaded from here: http://files.grouplens.org/datasets/movielens/ml-100k.zip
+
+# Troubleshooting
+If an AWS nuke procedure clears out your sandbox but does not delete all resources, then you may end up with orphaned resources.
+
+In this case, try 
+terraform destroy
+
+If this does not work, then delete the resource from the management console or the command line:
+
+Instance profiles:
+------------------
+aws iam delete-instance-profile --instance-profile-name {InstanceProfileName} 
+
+
