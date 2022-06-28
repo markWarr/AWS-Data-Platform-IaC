@@ -7,6 +7,7 @@ Make sure you run terraform destroy to tear down the installation when you have 
 It will take > 8 mins to create the cluster but terraform will keep the progress updated every 10 seconds in your shell.
 
 These scripts will do the following using the hashicorp/aws AWS provider:
+
 Resources created:
 - VPC
 - Subnet within the VPC including necessary security groups, roles, role policies  and role profiles.
@@ -52,10 +53,10 @@ terraform destroy
 ```
 
 Once installed, check that the resources have been instatiated correctly:
-Check that the emr-studio-bucket-mt S3 Bucket contains the Movielens data.
-In EMR, check that the EMR cluster has been created and is in the state "waiting - cluster ready"
-Create a notebook in EMR and link it to the created cluster
-Check that the notebook can be opened on JupyterLab.
+- Check that the emr-studio-bucket-mt S3 Bucket contains the Movielens data.
+- In EMR, check that the EMR cluster has been created and is in the state "waiting - cluster ready"
+- Create a notebook in EMR and link it to the created cluster
+- Check that the notebook can be opened on JupyterLab.
 
 If you wish to manually import the movielens data, run the following Lambda using the 'test' function: 
 ```
