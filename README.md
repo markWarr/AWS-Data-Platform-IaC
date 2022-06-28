@@ -7,14 +7,17 @@ Make sure you run terraform destroy to tear down the installation when you have 
 It will take > 8 mins to create the cluster but terraform will keep the progress updated every 10 seconds in your shell.
 
 These scripts will do the following using the hashicorp/aws AWS provider:
-- Create a VPC
-- Create subnet within the VPC including necessary security groups, roles, role policies  and role profiles.
-- Create an S3 bucket for storing EMR logs
-- Create an S3 bucket for EMR data
-- Create an EMR Cluster with Spark and Jupyter Enterprise Gateway applications
-- Create an EMR Studio instance with a connection to the EMR data S3 bucket
-- Create a Lambda function to import the MovieLens data, using the source in the pyton folder.
-- Run the Lambda function by using a Terraform output that quereies the output of the installed Lambda function.
+Resources created:
+- VPC
+- Subnet within the VPC including necessary security groups, roles, role policies  and role profiles.
+- S3 bucket for storing EMR logs
+- S3 bucket for EMR data
+- EMR Cluster with Spark and Jupyter Enterprise Gateway applications
+- EMR Studio instance with a connection to the EMR data S3 bucket
+- Lambda function to import the MovieLens data, using the source in the pyton folder.
+
+Actions:
+- Runs the created Lambda function by using a Terraform output that queries the output of the Lambda function.
 
 
 
